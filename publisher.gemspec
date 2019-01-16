@@ -38,4 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'simplecov-console'
   spec.add_development_dependency 'yard', '~> 0.9.16'
+  spec.add_development_dependency 'rspec_junit_formatter', '~> 0.4.1'
 end

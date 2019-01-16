@@ -1,0 +1,56 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/publisher
+    docker:
+      - image: circleci/ruby:2.3.7-node-browsers
+        environment:
+          BUNDLE_PATH: vendor/bundle
+          RAILS_ENV: test
+    steps:
+      - restore_cache:
+          name: Restore .git Directory
+          keys:
+            - publisher-source-{{ .Branch }}-{{ .Revision }}
+            - publisher-source-{{ .Branch }}-
+            - publisher-source-
+      - checkout
+      - save_cache:
+          name: Store .git Directory
+          key: publisher-source-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - .git
+      - restore_cache:
+          name: Restore Bundle Cache
+          key: publisher-rubygems-{{ checksum "Gemfile.lock" }}
+      - run:
+          name: Setup Bundler and Gems
+          command: |
+            bundle check --path=vendor/bundle || bundle install --jobs 4 --path=vendor/bundle
+      - run:
+          name: Run Specs
+          command: |
+            mkdir -p ~/rspec
+            RSPEC_FILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings --timings-type=filename)
+            echo $RSPEC_FILES
+            bundle exec rspec \
+              --profile=5 \
+              --fail-fast=5 \
+              --order random \
+              --format documentation \
+              --color \
+              --require spec_helper \
+              --format RspecJunitFormatter \
+              --out ~/rspec/rspec.xml -- $RSPEC_FILES
+
+      - save_cache:
+          name: Store Rubygems Cache
+          key: publisher-rubygems-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+            - .bundle
+      # collect reports
+      - store_test_results:
+          path: ~/rspec
+      - store_artifacts:
+          path: ~/rspec
