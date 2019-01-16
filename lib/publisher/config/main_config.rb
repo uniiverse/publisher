@@ -7,13 +7,10 @@ module Publisher
     #
     class MainConfig
       include Singleton
-      attr_accessor :logger, :enable_sentry
+      attr_accessor :logger
 
       def initialize
-        @enable_sentry = false
-
         init_logger
-        init_sentry
       end
 
       #
@@ -28,17 +25,6 @@ module Publisher
         instance.instance_eval(&block)
 
         instance
-      end
-
-      #
-      # Enable or disables sentry exceptions logging.
-      #
-      # @param [Boolean] use_sentry toggle value
-      #
-      # @return [Boolean] sentry config state
-      #
-      def enable_sentry=(use_sentry)
-        @enable_sentry = use_sentry
       end
 
       #
@@ -62,10 +48,6 @@ module Publisher
         else
           @logger = Logger.new(STDOUT)
         end
-      end
-
-      def init_sentry
-        # @dispatcher.enable_sentry = @enable_sentry
       end
     end
   end

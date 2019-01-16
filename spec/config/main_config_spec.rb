@@ -44,15 +44,4 @@ RSpec.describe Publisher::Config::MainConfig do
       Object.send :remove_const, :Rails
     end
   end
-
-  describe 'sentry' do
-    it 'does disables sentry by default' do
-      expect(instance.enable_sentry).to be_falsey
-    end
-
-    it 'enables sentry' do
-      instance.send :enable_sentry=, true
-      expect(instance.enable_sentry).to be_truthy
-    end
-  end
 end
