@@ -8,6 +8,11 @@ RSpec.describe Publisher do
   describe '.configure' do
     it 'returns an instance of Publisher::Config::MainConfig' do
       instance = Publisher.configure do |config|
+        config.gcloud do |gcloud_config|
+          gcloud_config.project_id = 'project_id'
+          gcloud_config.credentials = {}
+          gcloud_config.router = DummyRouter
+        end
       end
       expect(instance).to be_a(Publisher::Config::MainConfig)
     end

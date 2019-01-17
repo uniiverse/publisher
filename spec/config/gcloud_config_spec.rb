@@ -64,4 +64,25 @@ RSpec.describe Publisher::Config::GcloudConfig do
       expect(instance.valid?).to be true
     end
   end
+
+  describe '.project_id' do
+    it 'returns the current gcloud project id' do
+      instance.project_id = 'foobar'
+      expect(Publisher::Config::GcloudConfig.project_id).to eq 'foobar'
+    end
+  end
+
+  describe '.credentials' do
+    it 'returns the current gcloud credentials' do
+      instance.credentials = 'foobar'
+      expect(Publisher::Config::GcloudConfig.credentials).to eq 'foobar'
+    end
+  end
+
+  describe '.router' do
+    it 'returns the current gcloud router' do
+      instance.router = DummyRouter
+      expect(Publisher::Config::GcloudConfig.router).to be DummyRouter
+    end
+  end
 end

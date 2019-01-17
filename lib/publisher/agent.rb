@@ -3,19 +3,17 @@ module Publisher
   # A Pubsub agent that publishes messages to Pubsub.
   #
   class Agent
-    attr_accessor :payload, :action, :topic_name
+    attr_accessor :payload, :topic_name
     attr_reader :pubsub
 
     #
     # Constructor.
     #
     # @param [Hash] payload pubsub attributes.
-    # @param [String] action the performed action, ex: :create.
     # @param [String] topic_name name of pubsub topic to publish to.
     #
-    def initialize(payload, action, topic_name)
+    def initialize(payload, topic_name)
       self.payload = payload
-      self.action = action
       self.topic_name = topic_name
       init_pubsub
     end
@@ -42,8 +40,7 @@ module Publisher
           @pubsub.topic.publish payload
         end
       rescue => ex
-        # Raven.capture_exception(ex)
-        Rails.logger.error ex
+        # Logger.error ex
       end
     end
   end

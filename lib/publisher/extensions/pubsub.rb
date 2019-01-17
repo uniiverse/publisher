@@ -13,12 +13,7 @@ module Publisher
       # @param [String] action model action performed. Ex: :update, :create
       #
       def publish_to_pubsub(model, action)
-        data = Publisher::Config::GcloudConfig.router.new(model, action).route
-        if data.include?(:topic_name) && data.include?(:payload)
-          ::Publisher::Agent
-            .new(data[:payload], action, data[:topic_name])
-            .publish_to_pubsub(false)
-        end
+        publish(model, action)
       end
 
       #
@@ -28,11 +23,17 @@ module Publisher
       # @param [String] action model action performed. Ex: :update, :create
       #
       def publish_to_pubsub_async(model, action)
+        publish(model, action, true)
+      end
+
+      private
+
+      def publish(model, action, async = false)
         data = Publisher::Config::GcloudConfig.router.new(model, action).route
-        if data.include?(:topic_name) && data.include?(:payload)
+        if data.present? && data.include?(:topic_name) && data.include?(:payload)
           ::Publisher::Agent
-            .new(data[:payload], action, data[:topic_name])
-            .publish_to_pubsub(true)
+            .new(data[:payload], data[:topic_name])
+            .publish_to_pubsub(async)
         end
       end
     end

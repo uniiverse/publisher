@@ -25,15 +25,10 @@ module Publisher
       def pubsub
         return @pubsub unless @pubsub.nil?
 
-        begin
-          @pubsub = Google::Cloud::Pubsub.new(
-            project: Publisher::Config::GcloudConfig.project_id,
-            keyfile: Publisher::Config::GcloudConfig.credentials
-          )
-        rescue => ex
-          Raven.capture_exception(ex)
-          Rails.logger.error ex
-        end
+        @pubsub = Google::Cloud::Pubsub.new(
+          project: Publisher::Config::GcloudConfig.project_id,
+          keyfile: Publisher::Config::GcloudConfig.credentials
+        )
       end
 
       #
@@ -44,12 +39,7 @@ module Publisher
       def topic
         return @topic unless @topic.nil?
 
-        begin
-          @topic = pubsub.topic topic_name
-        rescue => ex
-          Raven.capture_exception(ex)
-          Rails.logger.error ex
-        end
+        @topic = pubsub.topic topic_name
       end
     end
   end

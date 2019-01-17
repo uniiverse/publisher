@@ -7,11 +7,6 @@ module Publisher
     #
     class MainConfig
       include Singleton
-      attr_accessor :logger
-
-      def initialize
-        init_logger
-      end
 
       #
       # DSL entry point.
@@ -34,20 +29,6 @@ module Publisher
       #
       def gcloud(&block)
         GcloudConfig.configure(&block)
-      end
-
-      private
-
-      def remove_logger!
-        @logger = nil
-      end
-
-      def init_logger
-        if defined?(Rails) && defined?(Rails.logger)
-          @logger = Rails.logger
-        else
-          @logger = Logger.new(STDOUT)
-        end
       end
     end
   end
