@@ -2,6 +2,17 @@ require 'spec_helper'
 
 RSpec.describe Publisher::Extensions::Pubsub do
   let(:model) { DummyModel.new }
+  before do
+    pubsub_double = double(Google::Cloud::Pubsub)
+    topic_double = double(Google::Cloud::Pubsub::Topic)
+    message_double = double(Google::Cloud::Pubsub::Message)
+    allow(Google::Cloud::Pubsub).to receive(:new).and_return(pubsub_double)
+    allow(pubsub_double).to receive(:topic).and_return(topic_double)
+    allow(topic_double).to receive(:publish).and_return(message_double)
+    allow(topic_double).to receive(:publish_async).and_return(message_double)
+    allow(topic_double).to receive_message_chain(:async_publisher, :stop, :wait!).and_return(nil)
+  end
+
   describe '#publish_to_pubsub' do
     it 'publishes a message synchronously' do
       DummyController.send :include, Publisher::Extensions::Pubsub

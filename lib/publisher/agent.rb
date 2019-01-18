@@ -33,14 +33,11 @@ module Publisher
     # @param [Boolean] async use async publishing or not.
     #
     def publish_to_pubsub(async = false)
-      begin
-        if async == true
-          @pubsub.topic.publish_async payload
-        else
-          @pubsub.topic.publish payload
-        end
-      rescue => ex
-        # Logger.error ex
+      if async
+        @pubsub.topic.publish_async payload
+        @pubsub.topic.async_publisher.stop.wait!
+      else
+        @pubsub.topic.publish payload
       end
     end
   end
