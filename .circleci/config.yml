@@ -1,37 +1,31 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/publisher
     docker:
-      - image: circleci/ruby:2.3.7-node-browsers
+      - image: ruby:2.3.4
         environment:
-          BUNDLE_PATH: vendor/bundle
+          BUNDLE_PATH: '/home/ubuntu/shared_bundle'
           RAILS_ENV: test
+    working_directory: /home/ubuntu/publisher
     steps:
-      - restore_cache:
-          name: Restore .git Directory
-          keys:
-            - publisher-source-{{ .Branch }}-{{ .Revision }}
-            - publisher-source-{{ .Branch }}-
-            - publisher-source-
       - checkout
-      - save_cache:
-          name: Store .git Directory
-          key: publisher-source-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - .git
       - restore_cache:
-          name: Restore Bundle Cache
-          key: publisher-rubygems-{{ checksum "Gemfile.lock" }}
+          key: publisher-{{ checksum "Gemfile.lock" }}
       - run:
-          name: Setup Bundler and Gems
+          name: Install Gems
           command: |
-            bundle check --path=vendor/bundle || bundle install --jobs 4 --path=vendor/bundle
+            mkdir -p $BUNDLE_PATH
+            bundle install
+      - save_cache:
+          key: publisher-{{ checksum "Gemfile.lock" }}
+          paths:
+            - "/home/ubuntu/shared_bundle"
       - run:
           name: Run Specs
+          environment:
+            RAILS_ENV: 'test'
           command: |
-            mkdir -p ~/rspec
-            RSPEC_FILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings --timings-type=filename)
+            SPEC_FILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
             echo $RSPEC_FILES
             bundle exec rspec \
               --profile=5 \
@@ -42,15 +36,3 @@ jobs:
               --require spec_helper \
               --format RspecJunitFormatter \
               --out ~/rspec/rspec.xml -- $RSPEC_FILES
-
-      - save_cache:
-          name: Store Rubygems Cache
-          key: publisher-rubygems-{{ checksum "Gemfile.lock" }}
-          paths:
-            - vendor/bundle
-            - .bundle
-      # collect reports
-      - store_test_results:
-          path: ~/rspec
-      - store_artifacts:
-          path: ~/rspec

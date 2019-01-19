@@ -17,7 +17,7 @@ RSpec.describe Publisher::Gcloud::Pubsub do
 
     Publisher.configure do |config|
       config.gcloud do |gcloud_config|
-        gcloud_config.project_id = 'prohect_id'
+        gcloud_config.project_id = 'project_id'
         gcloud_config.credentials = credentials
         gcloud_config.router = DummyRouter
       end

@@ -1,5 +1,8 @@
 require 'simplecov'
 require 'simplecov-console'
+require 'webmock/rspec'
+require 'active_record'
+require 'mongoid'
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new [
   SimpleCov::Formatter::HTMLFormatter,
@@ -26,6 +29,10 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.before do
+    Publisher::Config::GcloudConfig.instance.router = DummyRouter
   end
 end
 
