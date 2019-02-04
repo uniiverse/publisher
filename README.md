@@ -8,10 +8,7 @@ Add the following to a Rails initializer
 
 ```ruby
 project_id = AppConfig.instance.gcloud_project_id
-decoded_credentials = Base64.strict_decode64(
-  AppConfig.instance.data_pipelines
-)
-credentials = JSON.parse(decoded_credentials)
+credentials = ...
 
 Publisher.configure do |config|
   config.gcloud do |gcloud_config|
@@ -30,22 +27,20 @@ module Events
     class Router
       attr_accessor :model, :action
 
-       def initialize(model, action)
+      def initialize(model, action)
         self.model = model
         self.action = action
       end
 
-       # Depending on class being updated generate and send correct topic_name, payload, action to pubsum message publisher
-      def route(async = false)
-        topic_name = nil
-        payload = nil
-        case model.class.name
-        when 'Commission'
-          topic_name = :dwh_listing_expired
-          payload = { id: model.id.to_s, created_at: model.created_at.to_i, action: action }
-        end
-
-        { topic_name: topic_name, payload: payload }
+      def route
+        {
+          topic_name: "app_#{Rails.env}".to_sym,
+          payload: {
+          id: model.id,
+          action: action
+          eventTime: Time.now.in_time_zone('UTC').to_i
+          }
+        }
       end
     end
   end
@@ -57,5 +52,8 @@ To publish message include the module `Publisher::Extensions::Pubsub` and publis
 ```ruby
 include Publisher::Extensions::Pubsub
 ...
-publish_to_pubsub_async(Commission.last, :update)
+# Publish synchronously
+publish_to_pubsub(User.last, :update)
+# Publish asynchronously
+publish_to_pubsub_async(User.last, :update)
 ```
