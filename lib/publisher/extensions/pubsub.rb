@@ -30,7 +30,7 @@ module Publisher
 
       def publish(model, action, async = false)
         data = Publisher::Config::GcloudConfig.router.new(model, action).route
-        if data.present? && data.include?(:topic_name) && data.include?(:payload)
+        if data.present? && data.dig(:topic_name).present? && data.dig(:payload).present?
           ::Publisher::Agent
             .new(data[:payload], data[:topic_name])
             .publish_to_pubsub(async)
