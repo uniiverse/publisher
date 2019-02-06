@@ -1,5 +1,8 @@
 # Publisher
 
+[![CircleCI](https://circleci.com/gh/uniiverse/publisher.svg?style=svg&circle-token=209055ff2f326a7794b73db18518ca597f6192a0)](https://circleci.com/gh/uniiverse/publisher)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A library that facilitates publishing events to GCloud Pubsub topics.
 
 ## Usage
